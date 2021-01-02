@@ -1,0 +1,25 @@
+cd documents
+mkdir tchv1
+cd tchv1
+cat (Get-PSReadlineOption).HistorySavePath | Out-File -FilePath 1_pshistory.txt
+Get-LocalUser | ConvertTo-Html -Property Name,Enabled,Description -Head $Header | Out-File -FilePath 2_LocalUser.html
+Get-LocalUser | Where-Object {$_.Lastlogon -le (Get-Date).AddDays(-30)} | Select-Object Name,Enabled,SID,Lastlogon,Description | ConvertTo-Html -Property Name,Enabled,LastLogon,Description -Head $Header | Out-File -FilePath 3_LocalUserLast.html
+gcim win32_LoggedOnUser | select antecedent | Out-File -FilePath 4_loggedonUser.txt
+Get-service | ConvertTo-Html -Property Status,DisplayName,Name -Head $Header | Out-File -FilePath 5_Service.html
+Get-Process | ConvertTo-Html -Property ProcessName,CPU,WS, PM, NPM, HANDLES -Head $Header | Out-File -FilePath 6_Process.html
+Get-NetIPAddress | ConvertTo-Html -Property IPaddress,PrefixOrigin,Type,InterfaceAlias,Addressfamily -Head $Header | Out-File -FilePath 7_AdapterIPs.html
+Get-NetAdapter | ConvertTo-Html -Property IPaddress,Interfacealias,Addressfamily,Type -Head $Header | Out-File -FilePath 8_Adapters.html
+netsh advfirewall show allprofiles state | Out-File -FilePath 9_Firewallstatus.txt
+qwinsta | format-table | Out-File -FilePath 10_Remoteaccess_accounts.txt
+systeminfo | format-table | Out-File -FilePath 11_Sysinfo.txt
+tasklist | format-table | Out-File -FilePath 12_Tasklist.txt
+Get-WMIObject -Query "SELECT * FROM Win32_Share" | ConvertTo-Html -Property Name,Path,Description -Head $Header | Out-File -FilePath 13_Shares.html
+Get-WmiObject -Class Win32_Product | ConvertTo-Html -Property Name,Vendor,Version,  -Head $Header | Out-File -FilePath 14_Apps.html
+net view | format-table | Out-File -FilePath 15_Netview.txt
+whoami| format-table | Out-File -FilePath 16_Whoami.txt
+whoami /priv | format-table | Out-File -FilePath 17_Whoamipriv.txt
+net users | format-table | Out-File -FilePath 18_netusers.txt
+net localgroup administrators | format-table | Out-File -FilePath 19_localgroup.txt
+netstat | format-table | Out-File -FilePath 20_Netstat.txt
+compress-archive . .
+Echo "*All collection activities are now complete.*
